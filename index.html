@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard UI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #000; color: white; position: relative; transition: background 0.3s, color 0.3s; }
+        .sidebar { position: fixed; left: 20px; top: 50%; transform: translateY(-50%); }
+        .sidebar div { margin: 20px 0; cursor: pointer; background: #1a1a1a; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: center; transition: background 0.3s; }
+        .sidebar div:hover { background: #333; }
+        .domain-box { border: 2px solid red; padding: 20px; text-align: center; max-width: 400px; margin: auto; border-radius: 10px; background-color: black; color: white; position: relative; }
+        .background-effect { position: absolute; width: 100%; height: 100%; top: 0; left: 0; background: url('https://www.transparenttextures.com/patterns/black-felt.png'); opacity: 0.1; }
+        .toggle { width: 40px; height: 20px; background: #333; border-radius: 10px; position: relative; cursor: pointer; }
+        .toggle::before { content: ''; position: absolute; width: 16px; height: 16px; background: white; border-radius: 50%; top: 2px; left: 2px; transition: transform 0.3s; }
+        .light-mode .toggle::before { transform: translateX(20px); }
+        .light-mode { background: #f9f9f9; color: black; }
+        .popup { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #000; color: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(255, 0, 0, 0.5); text-align: center; border: 2px solid red; }
+        .popup.show { display: block; }
+        .popup button { background: red; color: white; padding: 8px 16px; border-radius: 5px; margin-top: 10px; cursor: pointer; border: none; }
+        .popup button:hover { background: darkred; }
+        .use-domain-btn { margin-top: 4px; padding: 12px 24px; background: linear-gradient(90deg, red, darkred); color: white; border-radius: 8px; cursor: pointer; transition: all 0.3s; border: none; font-size: 16px; font-weight: bold; display: inline-block; text-decoration: none; }
+        .use-domain-btn:hover { background: linear-gradient(90deg, darkred, black); transform: scale(1.05); }
+        canvas { position: absolute; top: 0; left: 0; z-index: -1; }
+
+        .line { height: 2px; background: #444; margin: 16px 0; }
+        .heading { color: white; }
+        .heading span { color: #ddd; text-shadow: 0 0 5px rgba(255, 255, 255, 0.8); }
+    </style>
+</head>
+<body class="p-6 relative">
+    <canvas id="canvas"></canvas>
+    <div class="background-effect"></div>
+    <div class="flex justify-between items-center mb-4">
+        <h1 class="text-2xl font-bold heading">Dashboard &gt; <span>Settings</span></h1>
+        <div class="flex items-center">
+            <span class="mr-2">Light MODE</span>
+            <div id="toggleMode" class="toggle"></div>
+        </div>
+    </div>
+    <div class="line"></div>
+    
+    <div class="sidebar">
+        <div class="text-white" onclick="showComingSoonPopup()">📊</div>
+        <div class="text-white" onclick="showComingSoonPopup()">👤</div>
+        <div class="text-white" onclick="showComingSoonPopup()">⚙️</div>
+    </div>
+
+    <div class="text-center mt-20">
+        <h2 class="text-red-500 text-2xl font-bold">CHOOSE A DOMAIN</h2>
+        <div class="domain-box mt-6">
+            <p class="text-xl font-bold">roblox.com.ni <span class="text-red-500">GLOBAL & TIKTOK</span></p>
+            <p class="text-red-500 text-2xl mt-2">★★★★★</p>
+            <a href="https://www.genned.net/auth/dv912" target="_blank" class="use-domain-btn">Use domain →</a>
+        </div>
+    </div>
+    
+    <div class="fixed bottom-5 right-5">
+        <button id="announcementsBtn" class="bg-gray-700 px-4 py-2 rounded-full">Announcements</button>
+    </div>
+    
+    <div id="popup" class="popup">
+        <h2 class="text-xl font-bold">Latest Updates</h2>
+        <pre class="mt-2">Here are the latest announcements and updates
+Site working fine!.</pre>
+        <button id="closePopup">Close</button>
+    </div>
+
+    <div id="comingSoonPopup" class="popup">
+        <h2 class="text-xl font-bold">Coming Soon</h2>
+        <p class="mt-2">Stay updated for upcoming features!</p>
+        <button id="closeComingSoon">Close</button>
+    </div>
+    
+    <script>
+        document.getElementById('toggleMode').addEventListener('click', function () {
+            document.body.classList.toggle('light-mode');
+        });
+        
+        document.getElementById('announcementsBtn').addEventListener('click', function () {
+            document.getElementById('popup').classList.add('show');
+        });
+        
+        document.getElementById('closePopup').addEventListener('click', function () {
+            document.getElementById('popup').classList.remove('show');
+        });
+
+        function showComingSoonPopup() {
+            document.getElementById('comingSoonPopup').classList.add('show');
+        }
+        
+        document.getElementById('closeComingSoon').addEventListener('click', function () {
+            document.getElementById('comingSoonPopup').classList.remove('show');
+        });
+
+        // Animation for fixed red glowing balls
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const balls = [];
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        function createBalls() {
+            for (let i = 0; i < 50; i++) {
+                const ball = {
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    dx: (Math.random() - 0.5) * 1,
+                    dy: (Math.random() - 0.5) * 1,
+                    radius: Math.random() * 2 + 1,
+                    alpha: Math.random() * 0.5 + 0.5,
+                };
+                balls.push(ball);
+            }
+        }
+
+        function drawBalls() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            balls.forEach(ball => {
+                ctx.beginPath();
+                ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 0, 0, ${ball.alpha})`;
+                ctx.fill();
+                ball.x += ball.dx;
+                ball.y += ball.dy;
+
+                if (ball.x < 0 || ball.x > canvas.width) ball.dx *= -1;
+                if (ball.y < 0 || ball.y > canvas.height) ball.dy *= -1;
+            });
+        }
+
+        createBalls();
+        setInterval(drawBalls, 30);
+    </script>
+</body>
+</html>
